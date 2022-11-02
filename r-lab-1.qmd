@@ -1,0 +1,21 @@
+---
+title: "Intro to R"
+author: "Jeremy Morris"
+affiliation-title: "University of Utah"
+date: last-modified
+title-block-style: default
+title-block-banner: true
+format: 
+  html:
+      embed-resources: true
+      theme: flatly
+      code-block-bg: true
+      code-block-border-left: "#31BAE9"
+      highlight-style: printing
+---
+
+## Objectives
+
+* Introduction to R Studio via R Studio Cloud
+* Gain experience working with markdown
+* Setup for the second R lab
