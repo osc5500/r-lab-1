@@ -12,10 +12,169 @@ format:
       code-block-bg: true
       code-block-border-left: "#31BAE9"
       highlight-style: printing
+execute:
+    message: false
+    warning: false
+    error: false
 ---
 
-## Objectives
+```{r setup}
+#| echo: false
+library(tidyverse)
+library(skimr)
+```
+
+# Objectives
 
 * Introduction to R Studio via R Studio Cloud
-* Gain experience working with markdown
+* Gain experience working with Quarto
 * Setup for the second R lab
+
+# Definitions
+
+* **R** -- Programming language created in 1995 specifically for statistical analysis and visualization.
+    * One benefit of R is the ability to add functionality using packages.
+* **RStudio** -- open source integrated development environment (IDE) for R programming. Not sure if this will be re-branded Posit soon?
+* **RStudio Cloud** -- cloud-based version of RStudio we will be using for these two labs.
+* **Quarto** -- open-source scientific and technical publishing system based on Pandoc. Allows you to mix explanatory text with executable code.
+    * Create dynamic content with Python, R, Julia, and Observable.
+    * Author documents as plain text markdown or Jupyter notebooks.
+    * Publish high-quality articles, reports, presentations, websites, blogs, and books in HTML, PDF, MS Word, ePub, and more.
+    * Author with scientific markdown, including equations, citations, crossrefs, figure panels, callouts, advanced layout, and more.
+* **ggplot** -- add-on package to R focused on creating data visualizations. R has a native plot object, ggplot is a big advancement.
+
+## Why use R?
+Up to this point in the semester, we have used Excel and Tableau. Broadly speaking, these tools serve the following purposes.
+
+* **Excel** -- spreadsheet software created for the following (note that it can be extended to do more, but these are the main things it is used for).
+    * Transferring data
+    * Performing simple to intermediate aggregations and formulas
+    * Creating basic data visualizations
+    * Doing basic statistical analysis
+* **Tableau** -- data visualization tool created for the following uses.
+    * Creating intermediate to advanced data visualizations.
+    * Performing basic statistical analysis.
+    * Can be extended for use as a dashboarding tool with some data acquisition and ETL capabilities.
+
+These two tools (or tools like them) can take you quite far in analytics. However, there are certain sets of problems or kinds of data manipulation tasks that require a more advanced tool. R is one of the two primary options for performing statistical analysis beyond what is available in the other tools we've used this semester.
+
+:::{.callout-note}
+Python is the other big player in the space. Python was created as a more general purpose language with data science functionality added via libraries. 
+:::
+
+## Why use R/Quarto
+Quarto shines when you need to create documents that include executable code and visualizations. It solves an issue many analysts find when they have to create visualizations or other executable assets for a presentation. Before Quarto the standard method for creating a presentation or technical document would be to create the technical parts of the document separate from the final presentation. This causes some issues when trying to update the document or trying to source the original versions of visualizations. When using Quarto, you can generate the document and run all code in one step. Users of Jupyter notebooks are also starting to use Quarto because you can generate Quarto output from Jupyter. 
+
+Quarto is the next step in the trend to make data science a multi-lingual experience so that work can be shared and presented independent of the system used to generate it.
+
+### Creating a Quarto file
+
+Creating a Quarto file is easy using R Studio. All you need to do is to click the "+" button in the top left and select Quarto Document. A wizard opens that will walk you through a few things needed to create the document. You can select HTML or PDF output and can even create slides or other document types with Quarto. For our purposes, we will always be creating HTML output as that's the only format Canvas will accept (because I told it to).
+
+You can then edit the document and do whatever you like. There are two ways to generate output when you are ready. First, you can click the "Render" button in the ribbon just below the file tab. Second, you can run the render command providing the filename. Details on how this is done follow. There are pros and cons to using each method.
+
+* __Render button__: this will run the file in a separate console. The primary benefit here is that anything you have going on in the R console will not be affected. However, none of the data or functions created will be added to the global environment. This is more important when you start caching results (I'll talk about this if you ask me questions otherwise, we'll leave it for another time).
+* __Render command__: this command will run all code in the open console, loading all objects and functions into the global environment. This can be great, unless it isn't. This can be dangerous if you don't clear your environment, for example, if you run your code blocks out of order. Following is the format for the render command.
+
+```{{r}}
+quarto::quarto_render('filename.qmd')
+```
+
+## Running Code
+To run code, you need to define what is called a "code block". This is done using the syntax below. This code block takes the "mtcars" data set and assigns it to a new variable. We then run the "summary" command. Note that all code and output shows up in the final document. It is often a good idea to give your code blocks a name (as seen below). Note that code block names need to be unique or your code will not run.
+
+Note that code blocks can also be hidden or set to "fold" based on specific parameters.
+
+```{r  code_block1}
+cars <- mtcars
+summary(cars)
+```
+
+Following is an alternate way of summarizing a data set using a package called skimr.
+```{r skimr-test}
+skimr::skim(mtcars)
+```
+
+# Bringing data into R
+There are many ways to get data into R. The two primary ways we will use in class are:
+
+* Using data sets included in base R (and other packages).
+* Reading data from external text or CSV files.
+
+You can also read data directly from the web and various APIs. If you find yourself needing to do that, let us know and we can help.
+
+### Using included data sets
+There are quite a few data sets that come with R out of the box. The most common being the "iris" data set along with "mtcars" which we saw earlier. To use either of these, you simply need to refer to them as variables. Typing "mtcars" into an R chunk will simply print all of the data out.
+
+```{r mtcars_print}
+mtcars
+```
+
+Other data sets need to be installed via an external library. For example, we might use a data set that includes all flights leaving NYC in 2013. For this, you'll need to load the "nycflights13" library. After that, the "flights" data set should be available. The next chunk, loads that library and prints a summary of the data set (because it has `r nrow(nycflights13::flights)` rows).
+
+```{r flights_data}
+library(nycflights13)
+skim(flights)
+```
+
+### Reading data from files
+The most common way to bring in non-system data sets is to read it from a text or comma-separated-values file. There are a few different functions that allow you to do this. My favorite happens to be the `read_csv` function from the `readr` library. Note that I have pre-loaded the `readr` library in the setup code block of this document so it will be available for all subsequent R code.
+
+I have downloaded a data set that contains a list of [vacation rentals in New Orleans](https://data.nola.gov/Housing-Land-Use-and-Blight/Vacation-Rentals-Hotels-B-B-short-term-rentals-etc/rbhq-zbz9). The following code reads that data set in using `read_csv.`
+
+```{r data_import}
+#| message: false
+no_vr <- read_csv('new_orleans_vacation_rental.csv')
+skim(no_vr)
+```
+
+# Creating Visualizations
+We will be creating some simple visualizations with `ggplot.` I'll highlight a few here and then will discuss `ggplot` more in the next lab. For now, let's say that `ggplot` works based on something called the "grammar of graphics" which specifies a theory for how visualizations should be created. The basic idea is that we start with some basic building blocks and then add layers to a graphic.
+
+Let's look at a few visualizations to end this lab. Note that we're able to create a professional looking report (in HTML in this case) that includes all our code and visualizations. No need to split them up and maintain them separately. Also, you should be able to check this code out from GitHub and run it on your own.
+
+### Data visualizations
+First, we'll take the New Orleans Vacation Rental data and calculate the number of units by `Type`.
+
+```{r no-stats}
+no_stats <- no_vr |>
+    group_by(Type) |>
+    summarise(num_units=n())
+```
+
+Then, create a simple bar chart showing the results.
+
+```{r bar}
+ggplot(no_stats) +
+    geom_col(aes(x=Type,y=num_units))
+```
+
+We see that the chart produced doesn't look that great. `ggplot` allows us a lot of flexibility. Let's rotate the chart and add a `theme` to make things look a little better.
+
+```{r bar2}
+ggplot(no_stats) +
+    geom_col(aes(y=Type,x=num_units)) +
+    theme_bw()
+```
+
+Now, we'll show how we can create an even better looking visualization by creating a custom theme, labeling axes and adding some color. Note that we'll filter the data a little before we do all that.
+
+```{r bar3}
+no_stats_short <- no_stats |> filter(num_units >= 100)
+theme_local <- function(bs=15,...){
+    theme_bw(base_size=bs) +
+    theme(
+        legend.position='bottom',
+        panel.grid=element_blank(),
+        axis.line.x=element_line(color='black'),
+        axis.line.y=element_line(color='black'),
+        panel.border=element_blank(),
+        ...
+    )
+}
+ggplot(no_stats_short) +
+    geom_col(aes(y=Type,x=num_units,fill=Type),show.legend=FALSE) +
+    scale_fill_manual(values=c('#EFEFEF','#EFEFEF','#2D5D7B','#EFEFEF','#EFEFEF')) +
+    labs(x='# of Units',y='',title='Some insight about Temporary STR') +
+    theme_local()
+```
