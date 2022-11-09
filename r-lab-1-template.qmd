@@ -36,11 +36,11 @@ theme_local <- function(bs=15,...){
 
 ## Task 1
 
-Answer the following question below: *What is one thing you have learned this semester?*
+*Answer the following question below: What is one thing you have learned this semester?*
 
 ## Task 2
 
-Interpret the following chart (put your answer below the visualization).
+*Interpret the following chart (put your answer below the visualization).*
 
 ```{r chart-data}
 #| echo: false
