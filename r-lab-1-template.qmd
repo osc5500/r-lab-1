@@ -21,6 +21,17 @@ execute:
 ```{r setup}
 #| echo: false
 library(tidyverse)
+theme_local <- function(bs=15,...){
+    theme_bw(base_size=bs) +
+    theme(
+        legend.position='bottom',
+        panel.grid=element_blank(),
+        axis.line.x=element_line(color='black'),
+        axis.line.y=element_line(color='black'),
+        panel.border=element_blank(),
+        ...
+    )
+}
 ```
 
 ## Task 1
@@ -32,20 +43,32 @@ Answer the following question below: *What is one thing you have learned this se
 Interpret the following chart (put your answer below the visualization).
 
 ```{r chart-data}
-month_order <- format(seq(from=as.Date('2012-01-01'),to=as.Date('2012-12-01'),by='month'),'%b')
-fish2013 <- read_csv('https://opendata.utah.gov/api/views/vcx7-8ycu/rows.csv?accessType=DOWNLOAD')
-fish2012 <- read_csv('https://opendata.utah.gov/api/views/n7ut-ihr8/rows.csv?accessType=DOWNLOAD')
-fish <- bind_rows(fish2012,fish2013) |>
-    mutate(dt=as.Date(`Date stocked`,format='%m/%d/%Y')) |>
-    mutate(yr=format(dt,'%Y'),month=factor(format(dt,'%b'),levels=month_order))
-fish_chart <- fish |>
-    group_by(Species,yr,month) |>
-    summarise(total=sum(Quantity),.groups='drop')
+#| echo: false
+wb <- read_csv('world-bank.csv')
+comp_vars <- c('GDP per capita (constant 2015 US$)','Government expenditure on education, total (% of GDP)')
+wb_comp <- wb |>
+    mutate(`2017 [YR2017]`=as.numeric(`2017 [YR2017]`)) |>
+    filter(!is.na(`Country Name`)) |>
+    pivot_wider(names_from=`Series Code`,values_from=`2017 [YR2017]`,id_cols=c(`Country Name`,`Country Code`)) |>
+    mutate(cc=case_when(
+        SE.XPD.TOTL.GB.ZS < 7 ~ 'low',
+        SE.XPD.TOTL.GB.ZS > 24 ~ 'high',
+        `Country Code` == 'USA' ~ 'USA',
+        TRUE ~ 'other'
+    ))
 ```
 
 ```{r chart1}
-ggplot(fish_chart) +
-    geom_line(aes(x=month,y=total,color=yr,group=yr)) +
-    facet_wrap(~Species) +
-    theme_bw()
+#| fig.align: center
+#| fig.width: 10
+#| fig.height: 6
+#| echo: false
+ggplot(wb_comp,aes(y=`SE.XPD.TOTL.GB.ZS`,x=`NY.GDP.MKTP.KD`/1000000)) +
+    geom_point(aes(color=cc),data=filter(wb_comp,cc == 'other')) +
+    geom_point(aes(color=cc),size=2,data=filter(wb_comp,cc != 'other')) +
+    ggrepel::geom_text_repel(aes(label=`Country Name`),size=5,data=filter(wb_comp,cc != 'other')) +
+    scale_x_log10(labels=scales::dollar) +
+    scale_color_manual(values=c('#185B77','#84CAE7','#D9D6D3','#22333B')) +
+    labs(y='Govt expenditure on education,\ntotal (% of govt expenditure)',x='GDP (constant 2015 US$)\nMillions') +
+    theme_local() + theme(legend.position='none')
 ```

@@ -18,6 +18,27 @@ execute:
     error: false
 ---
 
+# Get an RStudio Cloud account
+
+* Go to rstudio.cloud and sign up for an account
+* [Click this link](https://rstudio.cloud/spaces/305584/join?access_code=WPZyL8PiV58_Xqak7hToWSaxHT7vv6esiUiuM8Sx) to join the workspace for this course
+* Click R Lab 1
+
 # Assignment
 
-Using the `r-lab-template.qmd` file
+* Read the lab
+    * Open the r-lab-1.qmd file
+    * Click the "Render" button.
+    * Read through the lab in your browser (your browser should open a new tab).
+* Answer lab questions
+    * Open the `r-lab-template.qmd` file in RStudio Cloud
+    * Task 1
+        * Answer the question posed here by typing your answer below the question.
+    * Task 2
+        * Write one or two insights about the chart below the code generating the chart
+    * Render the file using the "Render" button.
+* Submit the lab
+    * Download the `r-lab-1-template.html` file using instructions given in the instructional video
+    * Submit to the assignment in Canvas
+
+Please reach out if you have any questions.
