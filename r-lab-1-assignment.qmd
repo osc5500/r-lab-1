@@ -1,0 +1,23 @@
+---
+title: "R Lab 1 | Assignment"
+author: "Jeremy Morris"
+affiliation-title: "University of Utah"
+date: last-modified
+title-block-style: default
+title-block-banner: true
+format: 
+  html:
+      embed-resources: true
+      theme: flatly
+      code-block-bg: true
+      code-block-border-left: "#31BAE9"
+      highlight-style: printing
+execute:
+    message: false
+    warning: false
+    error: false
+---
+
+# Assignment
+
+Using the `r-lab-template.qmd` file

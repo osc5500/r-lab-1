@@ -1,0 +1,51 @@
+---
+title: "R Lab 1 | Assignment"
+author: "Jeremy Morris"
+affiliation-title: "University of Utah"
+date: last-modified
+title-block-style: default
+title-block-banner: true
+format: 
+  html:
+      embed-resources: true
+      theme: flatly
+      code-block-bg: true
+      code-block-border-left: "#31BAE9"
+      highlight-style: printing
+execute:
+    message: false
+    warning: false
+    error: false
+---
+
+```{r setup}
+#| echo: false
+library(tidyverse)
+```
+
+## Task 1
+
+Answer the following question below: *What is one thing you have learned this semester?*
+
+## Task 2
+
+Interpret the following chart (put your answer below the visualization).
+
+```{r chart-data}
+month_order <- format(seq(from=as.Date('2012-01-01'),to=as.Date('2012-12-01'),by='month'),'%b')
+fish2013 <- read_csv('https://opendata.utah.gov/api/views/vcx7-8ycu/rows.csv?accessType=DOWNLOAD')
+fish2012 <- read_csv('https://opendata.utah.gov/api/views/n7ut-ihr8/rows.csv?accessType=DOWNLOAD')
+fish <- bind_rows(fish2012,fish2013) |>
+    mutate(dt=as.Date(`Date stocked`,format='%m/%d/%Y')) |>
+    mutate(yr=format(dt,'%Y'),month=factor(format(dt,'%b'),levels=month_order))
+fish_chart <- fish |>
+    group_by(Species,yr,month) |>
+    summarise(total=sum(Quantity),.groups='drop')
+```
+
+```{r chart1}
+ggplot(fish_chart) +
+    geom_line(aes(x=month,y=total,color=yr,group=yr)) +
+    facet_wrap(~Species) +
+    theme_bw()
+```

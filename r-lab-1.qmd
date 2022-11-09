@@ -134,33 +134,32 @@ We will be creating some simple visualizations with `ggplot.` I'll highlight a f
 Let's look at a few visualizations to end this lab. Note that we're able to create a professional looking report (in HTML in this case) that includes all our code and visualizations. No need to split them up and maintain them separately. Also, you should be able to check this code out from GitHub and run it on your own.
 
 ### Data visualizations
-First, we'll take the New Orleans Vacation Rental data and calculate the number of units by `Type`.
+Here we'll look at how to create some visualizations we've seen in some of our lectures regarding flight delays.
 
-```{r no-stats}
-no_stats <- no_vr |>
-    group_by(Type) |>
-    summarise(num_units=n())
+```{r data_prep}
+delay_by_month <- flights |>
+    mutate(delay=if_else(dep_delay > 0,1,0)) |>
+    group_by(origin,month) %>% summarise(n=n(),delay=sum(delay,na.rm=T),.groups='drop')
 ```
 
 Then, create a simple bar chart showing the results.
 
-```{r bar}
-ggplot(no_stats) +
-    geom_col(aes(x=Type,y=num_units))
+```{r standard1}
+ggplot(delay_by_month) +
+  geom_col(aes(x=month,y=delay,fill=origin),position='dodge') 
 ```
 
-We see that the chart produced doesn't look that great. `ggplot` allows us a lot of flexibility. Let's rotate the chart and add a `theme` to make things look a little better.
-
-```{r bar2}
-ggplot(no_stats) +
-    geom_col(aes(y=Type,x=num_units)) +
-    theme_bw()
+That doesn't look too great, so we'll make a few modifications.
+```{r highlight_important}
+ggplot(delay_by_month) +
+  geom_bar(aes(x=month,y=delay,fill=origin),position='dodge',stat='identity',color='#8ca2a6') +
+  scale_x_continuous(breaks=c(1:12)) +
+  scale_fill_manual(values=alpha(c('#bcc3c4','#bcc3c4','#fbbf5e'),0.7)) +
+  labs(x='Month',y='# of Flights with a Delay',fill='Origin',title='LGA Often Has the Fewest Delays') 
 ```
 
-Now, we'll show how we can create an even better looking visualization by creating a custom theme, labeling axes and adding some color. Note that we'll filter the data a little before we do all that.
-
-```{r bar3}
-no_stats_short <- no_stats |> filter(num_units >= 100)
+Last, we'll finish things up by changing to a line plot, adding nice x-axis labels and modifying the overall theme.
+```{r push_back}
 theme_local <- function(bs=15,...){
     theme_bw(base_size=bs) +
     theme(
@@ -172,9 +171,16 @@ theme_local <- function(bs=15,...){
         ...
     )
 }
-ggplot(no_stats_short) +
-    geom_col(aes(y=Type,x=num_units,fill=Type),show.legend=FALSE) +
-    scale_fill_manual(values=c('#EFEFEF','#EFEFEF','#2D5D7B','#EFEFEF','#EFEFEF')) +
-    labs(x='# of Units',y='',title='Some insight about Temporary STR') +
-    theme_local()
+month_list <- c('Jan','Feb','Mar','Apr','May','Jun',
+                'Jul','Aug','Sep','Oct','Nov','Dec')
+ggplot(delay_by_month) + 
+  geom_line(aes(x=month,y=delay,color=origin),size=1) +
+  scale_color_manual(values=alpha(c('#bcc3c4','#bcc3c4','#fbbf5e'),0.7)) +
+  scale_x_continuous(breaks=c(1:12),labels=month_list) +
+  labs(x='Month',y='# of Flights with a Delay',color='Origin',
+       title='LGA Often Has the Fewest Delays') +
+  theme_local()
 ```
+
+
+
