@@ -139,7 +139,7 @@ Here we'll look at how to create some visualizations we've seen in some of our l
 ```{r data_prep}
 delay_by_month <- flights |>
     mutate(delay=if_else(dep_delay > 0,1,0)) |>
-    group_by(origin,month) %>% summarise(n=n(),delay=sum(delay,na.rm=T),.groups='drop')
+    summarise(n=n(),delay=sum(delay,na.rm=T),.by=c(origin,month))
 ```
 
 Then, create a simple bar chart showing the results.
